@@ -38,14 +38,37 @@ class MenuListViewModel {
     }
     
     init() {
-        let menus: [Menu] = [
-                Menu(id: 0, name: "튀김1", price: 100, count: 0),
-                Menu(id: 1, name: "튀김1", price: 100, count: 0),
-                Menu(id: 2, name: "튀김1", price: 100, count: 0),
-                Menu(id: 3, name: "튀김1", price: 100, count: 0),
-        ]
+//        let menus: [Menu] = [
+//                Menu(id: 0, name: "튀김1", price: 100, count: 0),
+//                Menu(id: 1, name: "튀김1", price: 100, count: 0),
+//                Menu(id: 2, name: "튀김1", price: 100, count: 0),
+//                Menu(id: 3, name: "튀김1", price: 100, count: 0),
+//        ]
+            
         
-        menuObservable.onNext(menus)
+        // Model을 Api를 통해 받아오기 //
+        APIService.fetchAllMenusRx()
+            .map { data -> [MenuItem] in // parsing
+                
+                struct Response: Decodable {
+                    let menus: [MenuItem]
+                }
+                
+                let response = try! JSONDecoder().decode(Response.self, from: data)
+                
+                return response.menus
+                
+            }
+            .map { menuItems -> [Menu] in
+                var menus : [Menu] = []
+                menuItems.enumerated().forEach { index, item  in
+                    let menu = Menu.converterFromMenuItemsToMenu(id: index, item: item)
+                    menus.append(menu)
+                }
+                return menus
+            }
+            .take(1)
+            .bind(to: menuObservable)
     }
     
     func clearAllItemSelections() {
@@ -73,7 +96,6 @@ class MenuListViewModel {
                     }
                 }
             }
-             
             .take(1) // observable 한 번만 사용 하도록 처리 , 이거 안쓰면 계속 또 만들어짐. 한번 사용하고 끝나게 처리하기 위해 take(1)처리
             .subscribe(onNext: {
                 self.menuObservable.onNext($0)
