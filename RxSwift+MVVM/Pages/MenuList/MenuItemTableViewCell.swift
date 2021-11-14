@@ -12,10 +12,14 @@ class MenuItemTableViewCell: UITableViewCell {
     @IBOutlet var title: UILabel!
     @IBOutlet var count: UILabel!
     @IBOutlet var price: UILabel!
+    
+    var onChange : ((Int) -> Void)?
 
     @IBAction func onIncreaseCount() {
+        self.onChange?(+1)
     }
 
     @IBAction func onDecreaseCount() {
+        self.onChange?(-1)
     }
 }
