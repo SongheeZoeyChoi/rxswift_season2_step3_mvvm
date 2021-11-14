@@ -113,7 +113,7 @@ class MenuViewController: UIViewController {
 //            Menu(name: "changed", price: Int.random(in: 1000...30000), count: Int.random(in: 0...5))
 //        ])
         
-        viewModel.onDrder()
+        viewModel.onOrder()
     }
     
     
